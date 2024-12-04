@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   ADD YOUR NAME / SECTION NUMBER HERE
+ *   Piotr Slezak / Section 1
  *
  *   This java file contains the problem solutions of canFinish and
  *   numGroups methods.
@@ -8,6 +8,7 @@
  ********************************************************************/
 
 import java.util.*;
+import java.util.PriorityQueue;
 
 class ProblemSolutions {
 
@@ -72,16 +73,42 @@ class ProblemSolutions {
      * @return boolean          - True if all exams can be taken, else false.
      */
 
-    public boolean canFinish(int numExams, 
-                             int[][] prerequisites) {
+    public boolean canFinish(int numExams, int[][] prerequisites) {
       
         int numNodes = numExams;  // # of nodes in graph
 
         // Build directed graph's adjacency list
-        ArrayList<Integer>[] adj = getAdjList(numExams, 
-                                        prerequisites); 
+        ArrayList<Integer>[] adj = getAdjList(numExams, prerequisites);
+        int[] edges = new int[numNodes];
+        Queue<Integer> queue = new LinkedList<>();
 
-        // ADD YOUR CODE HERE - ADD YOUR NAME / SECTION AT TOP OF FILE
+        for(int i = 0; i < edges.length; i++){
+            for(int exam: adj[i]){
+                edges[exam]++; //counts edges for each node (prerequisites)
+            }
+        }
+
+        for(int i = 0; i < edges.length; i++){
+            if(edges[i] == 0){
+                queue.add(i); //adds non-prereq courses to queue
+            }
+        }
+
+        int count = 0; //keeps track of courses taken
+        while(!queue.isEmpty()){
+            int current = queue.poll();
+            count++;
+            for(int exam: adj[current]){ //removes current from edge prereq
+                edges[exam]--;
+                if(edges[exam] == 0){ //sees what exam can now be taken
+                    queue.add(exam); //and adds to queue
+                }
+            }
+        }
+
+        if(count == numNodes){ //checks if all exams were taken
+            return true;
+        }
         return false;
 
     }
@@ -98,11 +125,9 @@ class ProblemSolutions {
      * @return ArrayList<Integer>[]  - An adjacency list representing the provided graph.
      */
 
-    private ArrayList<Integer>[] getAdjList(
-            int numNodes, int[][] edges) {
+    private ArrayList<Integer>[] getAdjList(int numNodes, int[][] edges) {
 
-        ArrayList<Integer>[] adj 
-                    = new ArrayList[numNodes];      // Create an array of ArrayList ADT
+        ArrayList<Integer>[] adj = new ArrayList[numNodes];      // Create an array of ArrayList ADT
 
         for (int node = 0; node < numNodes; node++){
             adj[node] = new ArrayList<Integer>();   // Allocate empty ArrayList per node
@@ -166,7 +191,7 @@ class ProblemSolutions {
     public int numGroups(int[][] adjMatrix) {
         int numNodes = adjMatrix.length;
         Map<Integer,List<Integer>> graph = new HashMap();
-        int i = 0, j =0;
+        int i = 0, j = 0;
 
         /*
          * Converting the Graph Adjacency Matrix to
@@ -190,9 +215,39 @@ class ProblemSolutions {
             }
         }
 
-        // YOUR CODE GOES HERE - you can add helper methods, you do not need
-        // to put all code in this method.
-        return -1;
+        boolean[] visited = new boolean[numNodes];
+        int count = 0;
+
+        for(int k = 0; k < numNodes; k++) {
+            if(!visited[k]){ //if unvisited, check it for groups
+                visited[k] = true; //marks current node as visited
+                DFS(k, visited, graph);
+                count++; //increments after stack clears
+            }
+        }
+
+        return count;
     }
+
+    public void DFS(int node, boolean[] visited, Map<Integer, List<Integer>> graph){
+        Stack<Integer> stack = new Stack<>();
+        stack.push(node); //pushes current node onto stack
+
+        while (!stack.isEmpty()) {
+            int current = stack.pop();
+
+            if(graph.get(current) == null){ //checks if node exists
+                return;
+            }
+
+            for (int edge : graph.get(current)) {
+                if (!visited[edge]){ //prevents infinite loop
+                    visited[edge] = true; //marks other members as visited, keeping them in one group
+                    stack.push(edge); //adds other group members on the stack
+                }
+            }
+        }
+    }
+
 
 }

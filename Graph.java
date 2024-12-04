@@ -1,6 +1,6 @@
 /******************************************************************
  *
- *   YOUR NAME / SECTION NUMBER
+ *   Piotr Slezak / Section 1
  *
  *   Note, additional comments provided throughout this source code
  *   is for educational purposes
@@ -10,6 +10,7 @@
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
 
 /**
@@ -18,6 +19,7 @@ import java.util.List;
  *  The Graph class is a representing an oversimplified Directed Graph of vertices
  *  (nodes) and edges. The graph is stored in an adjacency list
  */
+
 
 public class Graph {
   int numVertices;                  // vertices in graph
@@ -103,8 +105,26 @@ public class Graph {
    */
   
   public int findRoot() {
+    int value = -1;
+    int[] edges = new int[numVertices];
 
-    // ADD YOUR CODE HERE - DO NOT FORGET TO ADD YOUR NAME/SECTION AT TOP OF FILE
-    return -1;
+    for(int i = 0; i < edges.length; i++){
+      for(int count : adjListArr[i]){ //counts the edges for each vertex
+        edges[count]++;
+      }
+    }
+
+    int roots = 0;
+    for(int i = 0; i < edges.length; i++){
+      if(edges[i] == 0){ //checks for root
+        roots++;
+        if(roots > 1) { //returns -1 if more than one root
+          return -1;
+        }
+          value = vertexValues.get(i); //sets value to root's
+      }
+    }
+
+    return value; //returns -1 unless overwritten
   } 
 }
